@@ -1,14 +1,29 @@
 const express = require('express')
 const cors = require('cors')
 const app = express()
-app.use(cors())
 const data = require("../data/data.json");
 const kiri = require("../model/Kirihistory");
-
+const path = require('path');
+const bodyParser = require('body-parser')
 let kiriObj = new kiri(data);
-app.get('/', (req, res) => {
-    console.log(kiriObj.getDataByDate("2014-27-2", "2015-28-2"));
-    res.send('Hello World!')
+const viewPath = "C:/KIRI/views"
+app.use(cors())
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+
+app.get("/", (req, res) => {
+    res.sendFile(path.join(`${viewPath}/index.html`));
+})
+
+app.post('/searchRoute', (req, res) => {
+    let filteredData = kiriObj.getFilteredData(req.body)
+    res.status(200).json({
+        'status': 'OK',
+        'messages': 'Data',
+        'data': filteredData,
+    })
 })
 
 module.exports = app;

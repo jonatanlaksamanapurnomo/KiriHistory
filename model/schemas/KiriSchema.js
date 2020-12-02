@@ -16,16 +16,20 @@ let kiriSchema = {
 
 const fieldNameMapper = kiri => {
     let timestamps = kiri.timestamp.split(":")
+    let date = moment(`${timestamps[0]} ${timestamps[2]} `, "YYYY-DD-MM hh")
     return (
         {
-            timestamp: moment(`${timestamps[0]} ${timestamps[2]} `, "YYYY-DD-MM hh"),
+            // timestamp: timestamps[0],
+            timestamp: date,
+            day: date.day() + "",
+            hour: date.hour() + "",
             start: {
-                lat: kiri.start.split(",")[0],
-                long: kiri.start.split(",")[1]
+                lat: parseFloat(kiri.start.split(",")[0]),
+                lng: parseFloat(kiri.start.split(",")[1])
             },
             end: {
-                lat: kiri.finish.split(",")[0],
-                long: kiri.finish.split(",")[1]
+                lat: parseFloat(kiri.finish.split(",")[0]),
+                lng: parseFloat(kiri.finish.split(",")[1])
             }
         }
     )
