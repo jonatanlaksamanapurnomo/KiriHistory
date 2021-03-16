@@ -287,6 +287,11 @@ destroy@~1.0.4:
   resolved "https://registry.yarnpkg.com/destroy/-/destroy-1.0.4.tgz#978857442c44749e4206613e37946205826abd80"
   integrity sha1-l4hXRCxEdJ5CBmE+N5RiBYJqvYA=
 
+doasync@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/doasync/-/doasync-2.0.1.tgz#5654811b087fc1820eaa8be51f544442299736ab"
+  integrity sha512-5u7qAb+ACe2dvxHXrhjWNAfWuj42yB45Z9ght+U9QkB09nNGYMw5S4q6sXcpVnxjcKGl0jUYcxrGpR6kBTGJHw==
+
 dot-prop@^5.2.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/dot-prop/-/dot-prop-5.3.0.tgz#90ccce708cd9cd82cc4dc8c3ddd9abdd55b20e88"
