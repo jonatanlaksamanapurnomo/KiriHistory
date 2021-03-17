@@ -11,7 +11,6 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 let modelKiri = new Kiri();
-
 app.get("/", (req, res) => {
     res.sendFile(path.join(`${viewPath}/index.html`));
 })
@@ -36,4 +35,4 @@ app.post('/searchRoute', (req, res) => {
 //     })
 // })
 
-module.exports = app;
+module.exports = {app , express};
