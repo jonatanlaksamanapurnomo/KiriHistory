@@ -1,15 +1,8 @@
 const express = require('express')
-const cors = require('cors')
 const app = express()
 const Kiri = require("../model/Kirihistory");
 const path = require('path');
-const bodyParser = require('body-parser')
 const viewPath = "C:/KiriHistory/views"
-app.use(cors())
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-    extended: true
-}));
 let modelKiri = new Kiri();
 app.get("/", (req, res) => {
     res.sendFile(path.join(`${viewPath}/index.html`));

@@ -1,6 +1,5 @@
 const {app,express} = require("./router/route");
 const port = 3000;
-console.log(__dirname)
 app.use(express.static('views'))
 app.use('/js', express.static(__dirname + 'views/js'))
 app.use('/css', express.static(__dirname + 'views/css'))
