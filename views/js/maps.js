@@ -31,7 +31,7 @@ function setMarkers(data) {
     return markers;
 }
 
-function setHeatMap(arrData) {
+function setHeatMap(arrData , map) {
     let heatmapData = [];
     arrData.forEach(item => {
         let startCoor = new google.maps.LatLng(item.start.lat, item.start.lng)
@@ -40,7 +40,8 @@ function setHeatMap(arrData) {
         heatmapData.push(endCoor)
     })
     let heatmap = new google.maps.visualization.HeatmapLayer({
-        data: heatmapData
+        data: heatmapData,
+        map:map
     });
     return heatmap;
 }
@@ -50,25 +51,39 @@ function sendRequest(url, data = {}) {
 }
 
 
-$(function () {
+function docReady(fn) {
+    // see if DOM is already available
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+        // call on next available tick
+        setTimeout(fn, 1);
+    } else {
+        document.addEventListener("DOMContentLoaded", fn);
+    }
+}
+docReady(function() {
     let map = initMap()
-    //this is bad pratice
+    let markerCluster = null;
     sendRequest("http://localhost:3000/searchRoute").then(res => {
         let markers = setMarkers(res.data.data)
-        $(document).on('click', '#mark-btn', function (e) {
+        document.getElementById('mark-btn').onclick = function(e){
             e.preventDefault();
-            //to reduce lag
-            markers.slice(0, 100).forEach(item => {
-                item.setMap(map)
-            })
-        })
-        $(document).on('click', '#clear-btn', function (e) {
+            markerCluster =  new MarkerClusterer(map, markers, {
+                imagePath:
+                    "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+            });
+        }
+
+        document.getElementById('heatmap-btn').onclick = function(e){
             e.preventDefault();
-            //to reduce lag
-            markers.slice(0, 100).forEach(item => {
+             setHeatMap(res.data.data , map)
+        }
+        document.getElementById('clear-btn').onclick = function(e){
+            e.preventDefault();
+            markerCluster.removeMarkers(markers);
+            markers.forEach(item => {
                 item.setMap(null)
             })
-        })
-
+        }
     })
 });
+
