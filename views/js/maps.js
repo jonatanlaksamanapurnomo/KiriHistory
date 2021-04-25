@@ -1,7 +1,8 @@
 function initMap() {
     let map = new google.maps.Map(document.getElementById("map"), {
         center: {lat: -6.914744, lng: 107.609810},
-        zoom: 12,
+        zoom: 13,
+
     });
     return map;
 }
@@ -9,6 +10,7 @@ function initMap() {
 function setMarkers(data, isStart, isEnd, filter = null) {
     let locations = [];
     data = filterData(data, filter).length <= 0 ? data : filterData(data, filter)
+
     if (isStart) {
         data.forEach(item => {
             let startMark = {
@@ -16,7 +18,6 @@ function setMarkers(data, isStart, isEnd, filter = null) {
                 pos: item.startCor,
                 icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
             }
-            // let endMark = {name: "end", pos: item.endCor}
             locations.push(startMark)
         })
     }
@@ -28,29 +29,41 @@ function setMarkers(data, isStart, isEnd, filter = null) {
         })
     }
 
+    // console.log("filtered markers size" , data.length)
     let markers = locations.map((item) => {
         return new google.maps.Marker({
-            position: {lat: item.pos.lat, lng: item.pos.lng},
+            position: {lat: parseFloat(item.pos.lat), lng: parseFloat(item.pos.lng)},
             icon: item.icon
         });
     });
     return markers;
 }
 
-function setHeatMap(arrData, map, filter = null) {
+function setHeatMap(arrData, map, isStart, isEnd, filter = null) {
     let heatmapData = [];
     arrData = filterData(arrData, filter).length <= 0 ? arrData : filterData(arrData, filter)
-    
-    arrData.forEach(item => {
-        let startCoor = new google.maps.LatLng(item.startCor.lat, item.startCor.lng)
-        let endCoor = new google.maps.LatLng(item.endCor.lat, item.endCor.lng)
-        heatmapData.push(startCoor)
-        heatmapData.push(endCoor)
-    })
+    if (isStart) {
+        arrData.forEach(item => {
+
+            let startCoor = {location: new google.maps.LatLng(item.startCor.lat, item.startCor.lng)}
+            heatmapData.push(startCoor)
+
+        })
+    }
+    if (isEnd) {
+        arrData.forEach(item => {
+            // {location: new google.maps.LatLng(37.782, -122.447), weight: 0.5},
+            let endLocationObj = {location: new google.maps.LatLng(item.endCor.lat, item.endCor.lng)}
+            heatmapData.push(endLocationObj)
+        })
+    }
+
     let heatmap = new google.maps.visualization.HeatmapLayer({
         data: heatmapData,
-        map: map
+        radius: 50
     });
+    heatmap.setMap(map);
+
     return heatmap;
 }
 
@@ -80,23 +93,8 @@ buildFilter = (filter) => {
 }
 
 createFilterObj = () => {
-
-    let days = [];
-    let hours = [];
-    for (let i = 0; i < 7; i++) {
-        const isChecked = document.getElementById(`day-${i}`).checked;
-        if (isChecked) {
-            days.push(i)
-        }
-
-    }
-    for (let i = 0; i < 24; i++) {
-        const isChecked = document.getElementById(`hour-${i}`).checked;
-        if (isChecked) {
-            hours.push(i)
-        }
-
-    }
+    let days = Array.from(document.getElementById("day").selectedOptions).map(option => parseInt(option.value))
+    let hours = Array.from(document.getElementById("hour").selectedOptions).map(option => parseInt(option.value));
     let filter = {day: days, hour: hours}
     return filter
 }
@@ -134,30 +132,37 @@ docReady(function () {
     let markers;
     let heatMap;
     sendRequest("http://localhost:3000/searchRoute").then(res => {
-        document.getElementById('mark-btn').onclick = function (e) {
+
+        document.getElementById("send-btn").onclick = function (e) {
             e.preventDefault();
-            let statusStartChecked = document.getElementById("start").checked
-            let statusEndChecked = document.getElementById("end").checked
-            let data = res.data.data;
+            let isMarkerCluster = document.getElementById("marker-cluster").checked
+            let isHeatMap = document.getElementById("heat-map").checked
+            let statusSelected = Array.from(document.getElementById("start-finish").selectedOptions).map(option => option.value)
+            let statusStartChecked = statusSelected.includes("start");
+            let statusEndChecked = statusSelected.includes("end")
             let filter = createFilterObj()
-            if (!Array.isArray(markers)) {
-                let query = buildFilter(filter)
-                markers = setMarkers(data, statusStartChecked, statusEndChecked, query)
-                markerCluster = new MarkerClusterer(map, markers, {
-                    imagePath:
-                        "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
-                });
+            if (isMarkerCluster) {
+                map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+                let data = res.data.data;
+                if (!Array.isArray(markers)) {
+                    let query = buildFilter(filter)
+                    markers = setMarkers(data, statusStartChecked, statusEndChecked, query)
+                    markerCluster = new MarkerClusterer(map, markers, {
+                        imagePath:
+                            "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+                    });
+                }
             }
 
-        }
-        document.getElementById('heatmap-btn').onclick = function (e) {
-            e.preventDefault();
-            let filter = createFilterObj()
-
-            if (!heatMap || heatMap.getMap() === null) {
-                heatMap = setHeatMap(res.data.data, map, filter)
+            if (isHeatMap) {
+                map.setMapTypeId(google.maps.MapTypeId.HYBRID);
+                let filter = createFilterObj()
+                if (!heatMap || heatMap.getMap() === null) {
+                    heatMap = setHeatMap(res.data.data, map, statusStartChecked, statusEndChecked, filter)
+                }
             }
         }
+
         document.getElementById('clear-btn').onclick = function (e) {
             e.preventDefault();
             if (markerCluster) {
