@@ -7,10 +7,8 @@ function initMap() {
     return map;
 }
 
-function setMarkers(data, isStart, isEnd, filter = null) {
+function setMarkers(data, isStart, isEnd) {
     let locations = [];
-    data = filterData(data, filter).length <= 0 ? data : filterData(data, filter)
-
     if (isStart) {
         data.forEach(item => {
             let startMark = {
@@ -39,9 +37,8 @@ function setMarkers(data, isStart, isEnd, filter = null) {
     return markers;
 }
 
-function setHeatMap(arrData, map, isStart, isEnd, filter = null) {
+function setHeatMap(arrData, map, isStart, isEnd) {
     let heatmapData = [];
-    arrData = filterData(arrData, filter).length <= 0 ? arrData : filterData(arrData, filter)
     if (isStart) {
         arrData.forEach(item => {
 
@@ -82,15 +79,6 @@ function docReady(fn) {
     }
 }
 
-buildFilter = (filter) => {
-    let query = {};
-    for (let keys in filter) {
-        if ((filter[keys].constructor === Object) || (filter[keys].constructor === Array && filter[keys].length > 0)) {
-            query[keys] = filter[keys];
-        }
-    }
-    return query;
-}
 
 createFilterObj = () => {
     let days = Array.from(document.getElementById("day").selectedOptions).map(option => parseInt(option.value))
@@ -98,27 +86,7 @@ createFilterObj = () => {
     let filter = {day: days, hour: hours}
     return filter
 }
-filterData = (data, query) => {
-    const keysWithMinMax = [];
-    const filteredData = data.filter((item) => {
-        for (let key in query) {
-            if (item[key] === undefined) {
-                return false;
-            } else if (keysWithMinMax.includes(key)) {
-                if (query[key]['min'] !== null && item[key] < query[key]['min']) {
-                    return false;
-                }
-                if (query[key]['max'] !== null && item[key] > query[key]['max']) {
-                    return false;
-                }
-            } else if (!query[key].includes(item[key])) {
-                return false;
-            }
-        }
-        return true;
-    });
-    return filteredData;
-};
+
 
 deleteMarkes = (markers) => {
     markers.forEach(item => {
@@ -126,27 +94,27 @@ deleteMarkes = (markers) => {
     })
     return null
 }
+
+
 docReady(function () {
     let map = initMap()
     let markerCluster = null;
     let markers;
     let heatMap;
-    sendRequest("http://localhost:3000/searchRoute").then(res => {
-
-        document.getElementById("send-btn").onclick = function (e) {
-            e.preventDefault();
-            let isMarkerCluster = document.getElementById("marker-cluster").checked
-            let isHeatMap = document.getElementById("heat-map").checked
-            let statusSelected = Array.from(document.getElementById("start-finish").selectedOptions).map(option => option.value)
-            let statusStartChecked = statusSelected.includes("start");
-            let statusEndChecked = statusSelected.includes("end")
-            let filter = createFilterObj()
+    document.getElementById("send-btn").onclick = function (e) {
+        e.preventDefault();
+        let filterParams = createFilterObj()
+        let isMarkerCluster = document.getElementById("marker-cluster").checked
+        let isHeatMap = document.getElementById("heat-map").checked
+        let statusSelected = Array.from(document.getElementById("start-finish").selectedOptions).map(option => option.value)
+        let statusStartChecked = statusSelected.includes("start");
+        let statusEndChecked = statusSelected.includes("end")
+        sendRequest("http://localhost:3000/searchRoute", filterParams).then(res => {
             if (isMarkerCluster) {
                 map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
                 let data = res.data.data;
                 if (!Array.isArray(markers)) {
-                    let query = buildFilter(filter)
-                    markers = setMarkers(data, statusStartChecked, statusEndChecked, query)
+                    markers = setMarkers(data, statusStartChecked, statusEndChecked)
                     markerCluster = new MarkerClusterer(map, markers, {
                         imagePath:
                             "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
@@ -156,24 +124,12 @@ docReady(function () {
 
             if (isHeatMap) {
                 map.setMapTypeId(google.maps.MapTypeId.HYBRID);
-                let filter = createFilterObj()
                 if (!heatMap || heatMap.getMap() === null) {
-                    heatMap = setHeatMap(res.data.data, map, statusStartChecked, statusEndChecked, filter)
+                    heatMap = setHeatMap(res.data.data, map, statusStartChecked, statusEndChecked)
                 }
             }
-        }
-
-        document.getElementById('clear-btn').onclick = function (e) {
-            e.preventDefault();
-            if (markerCluster) {
-                markerCluster.removeMarkers(markers);
-                markers = deleteMarkes(markers)
-            }
-            if (heatMap) {
-                heatMap.setMap(null)
-            }
-
-        }
-    })
+        });
+    }
+    
 });
 

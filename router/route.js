@@ -4,13 +4,15 @@ const Kiri = require("../model/Kirihistory");
 const path = require('path');
 const viewPath = "C:/KiriHistory/views"
 let modelKiri = new Kiri();
+app.use(express.json())
 app.get("/", (req, res) => {
     res.sendFile(path.join(`${viewPath}/index.html`));
 })
 
 
 app.post('/searchRoute', (req, res) => {
-    modelKiri.getData().then(data => {
+    let filterParams = req.body;
+    modelKiri.getData(filterParams).then(data => {
         res.status(200).json({
             'status': 'OK',
             'messages': 'Data',

@@ -102,4 +102,37 @@ function CSVToArray(strData, strDelimiter) {
     return (arrData);
 }
 
-module.exports = {csvToObject, CSVToArray};
+const buildFilter = (filter) => {
+    let query = {};
+    for (let keys in filter) {
+        if ((filter[keys].constructor === Object) || (filter[keys].constructor === Array && filter[keys].length > 0)) {
+            query[keys] = filter[keys];
+        }
+    }
+    return query;
+}
+
+
+ const filterData = (data, query) => {
+    const keysWithMinMax = [];
+    const filteredData = data.filter((item) => {
+        for (let key in query) {
+            if (item[key] === undefined) {
+                return false;
+            } else if (keysWithMinMax.includes(key)) {
+                if (query[key]['min'] !== null && item[key] < query[key]['min']) {
+                    return false;
+                }
+                if (query[key]['max'] !== null && item[key] > query[key]['max']) {
+                    return false;
+                }
+            } else if (!query[key].includes(item[key])) {
+                return false;
+            }
+        }
+        return true;
+    });
+    return filteredData;
+};
+
+module.exports = {csvToObject, CSVToArray , buildFilter , filterData};

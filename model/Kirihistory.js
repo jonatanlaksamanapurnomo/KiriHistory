@@ -1,10 +1,7 @@
 const fs = require("fs")
 const doAsync = require('doasync');
-const {csvToObject} = require("./Utils");
-
-
+const {csvToObject , buildFilter , filterData} = require("./Utils");
 class KiriHistory {
-
     constructor() {
         // fs.createReadStream(__dirname + "/data/KIRIStatistics.csv")
         //     .pipe(csv())
@@ -26,10 +23,15 @@ class KiriHistory {
             });
     }
 
-
-    getData = () => {
-        return this.data
+    //return promise
+    getData = (filterParams) => {
+        return this.data.then(res => {
+            let query = buildFilter(filterParams);
+            res = filterData(res, query);
+            return res
+        })
     }
+
 }
 
 module.exports = KiriHistory;
