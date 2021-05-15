@@ -1,35 +1,25 @@
 const fs = require("fs")
-const doAsync = require('doasync');
-const {csvToObject , buildFilter , filterData} = require("./Utils");
+const {csvToObject, buildFilter, filterData} = require("./Utils");
+
 class KiriHistory {
     constructor() {
-        // fs.createReadStream(__dirname + "/data/KIRIStatistics.csv")
-        //     .pipe(csv())
-        //     .on('data', (data) => {
-        //         console.log(data)
-        //     })
-        //     .on('end', () => {
-        //
-        //     });
+        fs.readFile(__dirname + "/data/KIRIStatistics.csv", "utf8", ((err, data) => {
+            if (err === null) {
 
-        this.data = doAsync(fs).readFile(__dirname + "/data/KIRIStatistics.csv", "utf8")
-            .then((data) => {
                 let arrCSV = data.split("\n")
                 //remove header
                 arrCSV.shift();
-                return arrCSV.map(csvToObject).filter(item => item !== undefined);
-            }).catch(() => {
-                console.log("err")
-            });
+                // console.log(arrCSV);
+                this.data = arrCSV.map(csvToObject).filter(item => item !== undefined);
+            }
+        }))
     }
 
     //return promise
     getData = (filterParams) => {
-        return this.data.then(res => {
-            let query = buildFilter(filterParams);
-            res = filterData(res, query);
-            return res
-        })
+        let query = buildFilter(filterParams);
+        this.data = filterData(this.data, query);
+        return this.data;
     }
 
 }

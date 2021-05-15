@@ -12,22 +12,14 @@ app.get("/", (req, res) => {
 
 app.post('/searchRoute', (req, res) => {
     let filterParams = req.body;
-    modelKiri.getData(filterParams).then(data => {
-        res.status(200).json({
-            'status': 'OK',
-            'messages': 'Data',
-            'data': data,
-        })
+    let data = modelKiri.getData(filterParams);
+    res.status(200).json({
+        'status': 'OK',
+        'messages': 'Data',
+        'data': data,
     })
+
 })
 
-// app.post('/searchRoute', (req, res) => {
-//     let filteredData = kiriObj.getFilteredData(req.body)
-//     res.status(200).json({
-//         'status': 'OK',
-//         'messages': 'Data',
-//         'data': filteredData,
-//     })
-// })
 
-module.exports = {app , express};
+module.exports = {app, express};

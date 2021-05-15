@@ -123,13 +123,23 @@ docReady(function () {
             }
 
             if (isHeatMap) {
-                map.setMapTypeId(google.maps.MapTypeId.HYBRID);
+                map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
                 if (!heatMap || heatMap.getMap() === null) {
                     heatMap = setHeatMap(res.data.data, map, statusStartChecked, statusEndChecked)
                 }
             }
         });
     }
-    
+
+    document.getElementById('clear-btn').onclick = function (e) {
+        e.preventDefault();
+        if (markerCluster) {
+            markerCluster.removeMarkers(markers);
+            markers = deleteMarkes(markers)
+        }
+        if (heatMap) {
+            heatMap.setMap(null)
+        }
+    }
 });
 
