@@ -83,7 +83,7 @@ function docReady(fn) {
 createFilterObj = () => {
     let days = Array.from(document.getElementById("day").selectedOptions).map(option => parseInt(option.value))
     let hours = Array.from(document.getElementById("hour").selectedOptions).map(option => parseInt(option.value));
-    let filter = {day: days, hour: hours}
+    let filter = {day: days, hour: hours};
     return filter
 }
 
@@ -101,45 +101,59 @@ docReady(function () {
     let markerCluster = null;
     let markers;
     let heatMap;
+
     document.getElementById("send-btn").onclick = function (e) {
         e.preventDefault();
-        let filterParams = createFilterObj()
-        let isMarkerCluster = document.getElementById("marker-cluster").checked
-        let isHeatMap = document.getElementById("heat-map").checked
-        let statusSelected = Array.from(document.getElementById("start-finish").selectedOptions).map(option => option.value)
-        let statusStartChecked = statusSelected.includes("start");
-        let statusEndChecked = statusSelected.includes("end")
-        sendRequest("http://localhost:3000/searchRoute", filterParams).then(res => {
-            if (isMarkerCluster) {
-                map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
-                let data = res.data.data;
-                if (!Array.isArray(markers)) {
-                    markers = setMarkers(data, statusStartChecked, statusEndChecked)
-                    markerCluster = new MarkerClusterer(map, markers, {
-                        imagePath:
-                            "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
-                    });
-                }
+        let filterParams = createFilterObj();
+        if (filterParams.day.length <= 0) {
+            console.log("fill day");
+        } else if (filterParams.hour.length <= 0) {
+            console.log("hour need to be filled");
+        } else {
+            let isMarkerCluster = document.getElementById("marker-cluster").checked
+            let isHeatMap = document.getElementById("heat-map").checked
+            let statusSelected = Array.from(document.getElementById("start-finish").selectedOptions).map(option => option.value)
+            let statusStartChecked = statusSelected.includes("start");
+            let statusEndChecked = statusSelected.includes("end")
+            if (markerCluster) {
+                markerCluster.removeMarkers(markers);
+                markers = deleteMarkes(markers)
             }
+            if (heatMap) {
+                heatMap.setMap(null)
+            }
+            sendRequest("http://localhost:3000/searchRoute", filterParams).then(res => {
+                if (isMarkerCluster) {
+                    map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+                    let data = res.data.data;
+                    if (!Array.isArray(markers)) {
+                        markers = setMarkers(data, statusStartChecked, statusEndChecked)
+                        markerCluster = new MarkerClusterer(map, markers, {
+                            imagePath:
+                                "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+                        });
+                    }
+                }
+                if (isHeatMap) {
+                    map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+                    if (!heatMap || heatMap.getMap() === null) {
+                        heatMap = setHeatMap(res.data.data, map, statusStartChecked, statusEndChecked)
+                    }
+                }
+            });
+        }
 
-            if (isHeatMap) {
-                map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
-                if (!heatMap || heatMap.getMap() === null) {
-                    heatMap = setHeatMap(res.data.data, map, statusStartChecked, statusEndChecked)
-                }
-            }
-        });
     }
 
-    document.getElementById('clear-btn').onclick = function (e) {
-        e.preventDefault();
-        if (markerCluster) {
-            markerCluster.removeMarkers(markers);
-            markers = deleteMarkes(markers)
-        }
-        if (heatMap) {
-            heatMap.setMap(null)
-        }
-    }
+    // document.getElementById('clear-btn').onclick = function (e) {
+    //     e.preventDefault();
+    //     if (markerCluster) {
+    //         markerCluster.removeMarkers(markers);
+    //         markers = deleteMarkes(markers)
+    //     }
+    //     if (heatMap) {
+    //         heatMap.setMap(null)
+    //     }
+    // }
 });
 
