@@ -17,6 +17,7 @@ class KiriHistory {
             }
         }))
     }
+    //trigger heroku
     filterData = (filterParams) => {
         this.fetchData();
         let query = buildFilter(filterParams);
