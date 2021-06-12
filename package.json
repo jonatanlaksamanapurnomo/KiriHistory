@@ -4,7 +4,7 @@
   "description": "",
   "main": "router/route.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "cypress open",
     "start": "nodemon server.js"
   },
   "author": "",
@@ -14,6 +14,7 @@
     "nodemon": "^2.0.6"
   },
   "devDependencies": {
-    "cypress": "^7.5.0"
+    "cypress": "^7.5.0",
+    "cypress-image-snapshot": "^4.0.1"
   }
 }

@@ -1,4 +1,5 @@
-const host = "https://kiri-app.herokuapp.com" || "http://localhost:3000"
+const IS_LOCAL_TEST = false;
+const host = IS_LOCAL_TEST ? "http://localhost:3000" : "https://kiri-app.herokuapp.com";
 
 function initMap() {
     let map = new google.maps.Map(document.getElementById("map"), {
