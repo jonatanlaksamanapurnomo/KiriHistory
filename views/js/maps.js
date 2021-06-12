@@ -1,3 +1,5 @@
+const host = "https://kiri-app.herokuapp.com" || "http://localhost:3000"
+
 function initMap() {
     let map = new google.maps.Map(document.getElementById("map"), {
         center: {lat: -6.914744, lng: 107.609810},
@@ -122,7 +124,7 @@ docReady(function () {
             if (heatMap) {
                 heatMap.setMap(null)
             }
-            sendRequest("http://localhost:3000/searchRoute", filterParams).then(res => {
+            sendRequest(`${host}/searchRoute`, filterParams).then(res => {
                 if (isMarkerCluster) {
                     map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
                     let data = res.data.data;
@@ -144,16 +146,5 @@ docReady(function () {
         }
 
     }
-
-    // document.getElementById('clear-btn').onclick = function (e) {
-    //     e.preventDefault();
-    //     if (markerCluster) {
-    //         markerCluster.removeMarkers(markers);
-    //         markers = deleteMarkes(markers)
-    //     }
-    //     if (heatMap) {
-    //         heatMap.setMap(null)
-    //     }
-    // }
 });
 
