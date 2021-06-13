@@ -2,7 +2,7 @@ const localTest = false;
 const WEB_DOMAIN_NAME = localTest ? "http://localhost:3000" : "https://kiri-app.herokuapp.com";
 const COMPLETION_STATUS = ["Start", "End"];
 const DAYS = ['Monday', "Tuesday", "Wednesday", "Thrusday", "Friday", "Saturday", "Sunday"];
-const HOURS_TEST = ['10:00', "11:00", "12:00", "13:00"];
+const HOURS_TEST = ["12:00"];
 const HOURS = ['0:00', "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"];
 Cypress.on('uncaught:exception', (err, runnable) => {
     return false;
@@ -35,13 +35,46 @@ describe('KIRI history html dom end to end testing', () => {
         cy.get('#heat-map').click().check();
     })
 })
-//Check Marker Clustering
+
 COMPLETION_STATUS.forEach(status => {
     DAYS.forEach(day => {
         HOURS_TEST.forEach(hour => {
-            describe('Check marker loaded with visual regression method', () => {
-                it(`Test for marker cluster in status ${status},day ${day},and ${hour}`, () => {
+            describe("Functional Testing  check with http request status", () => {
+                it(`Test for marker cluster in status ${status},day ${day},and time ${hour}`, () => {
                     cy.get('#marker-cluster').click();
+                    cy.get('#start-finish').select(status).get("#day").select(day);
+                    cy.get("#hour").select(hour).get("#send-btn").click().request('POST', '/searchRoute').then(res =>
+                        expect(res.status).to.eq(200)
+                    );
+                })
+            });
+        })
+    })
+})
+
+COMPLETION_STATUS.forEach(status => {
+    DAYS.forEach(day => {
+        HOURS_TEST.forEach(hour => {
+            describe("Functional Testing  check with http request status", () => {
+                it(`Test for marker cluster functional in status ${status},day ${day},and time ${hour}`, () => {
+                    cy.get('#marker-cluster').click();
+                    cy.get('#start-finish').select(status).get("#day").select(day);
+                    cy.get("#hour").select(hour).get("#send-btn").click().request('POST', '/searchRoute').then(res =>
+                        expect(res.status).to.eq(200)
+                    );
+                })
+            });
+        })
+    })
+})
+
+
+COMPLETION_STATUS.forEach(status => {
+    DAYS.forEach(day => {
+        HOURS_TEST.forEach(hour => {
+            describe('Functional Testing  check with visual regression', () => {
+                it(`Test for heat map functional  in status ${status},day ${day},and time ${hour}`, () => {
+                    cy.get('#heat-map').click();
                     cy.get('#start-finish').select(status).get("#day").select(day);
                     cy.get("#hour").select(hour).get("#send-btn").click().get("#map").notMatchImageSnapshot();
                     cy.get('#start-finish').select(status).get("#day").select(day);
@@ -56,8 +89,8 @@ COMPLETION_STATUS.forEach(status => {
 COMPLETION_STATUS.forEach(status => {
     DAYS.forEach(day => {
         HOURS_TEST.forEach(hour => {
-            describe('Check heat map loaded with visual regression method', () => {
-                it(`Test for heat map in status ${status},day ${day},and ${hour}`, () => {
+            describe('Functional Testing  check with http request status', () => {
+                it(`Test for heat map in status ${status},day ${day},and time ${hour}`, () => {
                     cy.get('#heat-map').click().get('#start-finish').select(status).get("#day").select(day);
                     cy.get("#hour").select(hour).get("#send-btn").click().get("#map").notMatchImageSnapshot();
                     cy.get('#start-finish').select(status).get("#day").select(day);
