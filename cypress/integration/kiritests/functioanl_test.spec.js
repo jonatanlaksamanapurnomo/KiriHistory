@@ -36,47 +36,16 @@ describe('KIRI history html dom end to end testing', () => {
     })
 })
 
-COMPLETION_STATUS.forEach(status => {
-    DAYS.forEach(day => {
-        HOURS_TEST.forEach(hour => {
-            describe("Functional Testing  check with http request status", () => {
-                it(`Test for marker cluster in status ${status},day ${day},and time ${hour}`, () => {
-                    cy.get('#marker-cluster').click();
-                    cy.get('#start-finish').select(status).get("#day").select(day);
-                    cy.get("#hour").select(hour).get("#send-btn").click().request('POST', '/searchRoute').then(res =>
-                        expect(res.status).to.eq(200)
-                    );
-                })
-            });
-        })
-    })
-})
-
-COMPLETION_STATUS.forEach(status => {
-    DAYS.forEach(day => {
-        HOURS_TEST.forEach(hour => {
-            describe("Functional Testing  check with http request status", () => {
-                it(`Test for marker cluster functional in status ${status},day ${day},and time ${hour}`, () => {
-                    cy.get('#marker-cluster').click();
-                    cy.get('#start-finish').select(status).get("#day").select(day);
-                    cy.get("#hour").select(hour).get("#send-btn").click().request('POST', '/searchRoute').then(res =>
-                        expect(res.status).to.eq(200)
-                    );
-                })
-            });
-        })
-    })
-})
-
 
 COMPLETION_STATUS.forEach(status => {
     DAYS.forEach(day => {
         HOURS_TEST.forEach(hour => {
             describe('Functional Testing  check with visual regression', () => {
-                it(`Test for heat map functional  in status ${status},day ${day},and time ${hour}`, () => {
-                    cy.get('#heat-map').click();
+                it(`Test for marker cluster functional  in status ${status},day ${day},and time ${hour}`, () => {
+                    cy.get('#marker-cluster').click();
                     cy.get('#start-finish').select(status).get("#day").select(day);
                     cy.get("#hour").select(hour).get("#send-btn").click().get("#map").notMatchImageSnapshot();
+
                     cy.get('#start-finish').select(status).get("#day").select(day);
                     cy.get("#hour").select(hour).get("#send-btn").click().get("#map").wait(2000).notMatchImageSnapshot();
 
@@ -89,15 +58,32 @@ COMPLETION_STATUS.forEach(status => {
 COMPLETION_STATUS.forEach(status => {
     DAYS.forEach(day => {
         HOURS_TEST.forEach(hour => {
-            describe('Functional Testing  check with http request status', () => {
+            describe('Functional Testing  check with visual regression ', () => {
                 it(`Test for heat map in status ${status},day ${day},and time ${hour}`, () => {
                     cy.get('#heat-map').click().get('#start-finish').select(status).get("#day").select(day);
                     cy.get("#hour").select(hour).get("#send-btn").click().get("#map").notMatchImageSnapshot();
+
                     cy.get('#start-finish').select(status).get("#day").select(day);
                     cy.get("#hour").select(hour).get("#send-btn").click().get("#map").wait(2000).notMatchImageSnapshot();
 
                 })
             })
+        })
+    })
+})
+
+COMPLETION_STATUS.forEach(status => {
+    DAYS.forEach(day => {
+        HOURS_TEST.forEach(hour => {
+            describe("Functional Testing  check with http request status", () => {
+                it(`Test for marker cluster in status ${status},day ${day},and time ${hour}`, () => {
+                    cy.get('#marker-cluster').click();
+                    cy.get('#start-finish').select(status).get("#day").select(day);
+                    cy.get("#hour").select(hour).get("#send-btn").click().request('POST', '/searchRoute').then(res =>
+                        expect(res.status).to.eq(200)
+                    );
+                })
+            });
         })
     })
 })

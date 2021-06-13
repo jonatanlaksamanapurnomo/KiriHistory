@@ -4,8 +4,9 @@
   "description": "",
   "main": "router/route.js",
   "scripts": {
-    "test": "cypress open",
-    "start": "nodemon server.js"
+    "test": "cypress run",
+    "start": "nodemon server.js",
+    "test-record": "cypress run --record --key 969c4a31-6e8a-499f-ad4b-dfd3b19f5cf6"
   },
   "author": "",
   "license": "ISC",

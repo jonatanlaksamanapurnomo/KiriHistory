@@ -1,4 +1,5 @@
 .idea/
 node_modules/
-cypress/snapshoot
+cypress/snapshots
 cypress/videos
+cypress/screenshots
