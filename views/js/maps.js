@@ -1,4 +1,4 @@
-const IS_LOCAL_TEST = false;
+const IS_LOCAL_TEST = true;
 const host = IS_LOCAL_TEST ? "http://localhost:3000" : "https://kiri-app.herokuapp.com";
 
 function initMap() {
@@ -126,6 +126,7 @@ docReady(function () {
                 heatMap.setMap(null)
             }
             sendRequest(`${host}/searchRoute`, filterParams).then(res => {
+                document.getElementById("result-length").innerHTML = res.data.data.length;
                 if (isMarkerCluster) {
                     map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
                     let data = res.data.data;
